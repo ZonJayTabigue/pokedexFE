@@ -12,7 +12,8 @@ import { Box,
          InputGroup, 
          InputRightElement, 
          IconButton,
-         Link } from '@chakra-ui/react';
+         Link, 
+         useToast} from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { loginAPI } from '../../utils/api/Login';
@@ -24,7 +25,7 @@ const Login = () => {
   const [username, setUsername] =  useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-
+  const toast = useToast();
 
   const handlePasswordVisibility = () => {
       setShowPassword(!showPassword);
@@ -33,10 +34,15 @@ const Login = () => {
   async function handleSubmit (event: React.FormEvent) {
       const res = await loginAPI(username, password);
       if (res.status === 200) {
-         console.log('weesd')
          navigate('/');
       } else {
-         alert(res.message); 
+        toast({
+          title: res.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'top'
+        });
       }
 
   };
