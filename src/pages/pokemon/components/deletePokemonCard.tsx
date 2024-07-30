@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Box,
   Button,
-  ButtonGroup,
   Card,
   CardBody,
   CardFooter,
@@ -14,20 +13,46 @@ import {
   Stack,
   Text,
   useColorModeValue,
+  useToast,
 } from '@chakra-ui/react';
 import { PokemonType } from '../../../utils/prop_types/PropTypes';
-import { Link } from 'react-router-dom';
 import { getColorScheme } from '../../../utils/functions/getColorScheme';
+import { deletePokemon } from '../../../utils/api/pokemons/deletePokemon';
+
 interface Props {
   pokemon: PokemonType;
-  key: number;
+  onDelete: () => void;
 }
 
-const PokemonCard = ({ pokemon }: Props) => {
+const DeletePokemonCard = ({ pokemon, onDelete }: Props) => {
   const bg = useColorModeValue('white', 'gray.700');
   const color = useColorModeValue('gray.800', 'white');
   const borderColor = useColorModeValue('gray.200', 'transparent');
-  
+  const toast = useToast();
+
+  const handleDeletePokemon = async () => {
+    try {
+      await deletePokemon(pokemon._id);
+      toast({
+        title: 'Pokémon Deleted.',
+        description: 'Your Pokémon has been deleted successfully.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+      onDelete();
+    } catch (error) {
+      toast({
+        title: 'Error deleting Pokémon.',
+        description: 'There was an error deleting the Pokémon.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      console.log('Failed to delete Pokémon:', error);
+    }
+  }
+
   return (
     <Card color={color} bg={bg} maxW='sm' border='1px' borderColor={borderColor}>
       <CardBody>
@@ -55,7 +80,7 @@ const PokemonCard = ({ pokemon }: Props) => {
           <Flex alignItems="center" justifyContent="space-between" width="100%">
             <Heading size="lg">{(pokemon?.name).toLocaleUpperCase()}</Heading>
             <Flex direction="column" alignItems="center">
-              {pokemon.types?.map((type, index) => (
+              {pokemon.types.map((type, index) => (
                 <Image
                   key={index}
                   src={`/type_icons/${type.name.toLowerCase()}.png`}
@@ -68,7 +93,7 @@ const PokemonCard = ({ pokemon }: Props) => {
             </Flex>
           </Flex>
           <Stack mt='0' spacing='1'>
-            {pokemon.stats?.map((stat, index) => (
+            {pokemon.stats.map((stat, index) => (
               <Box key={index}>
                 <Flex justifyContent="space-between">
                   <Text fontWeight="bold">{stat.stat?.name}</Text>
@@ -82,17 +107,12 @@ const PokemonCard = ({ pokemon }: Props) => {
       </CardBody>
       <Divider />
       <CardFooter>
-        <ButtonGroup spacing='24'>
-          <Button as={Link} to={`/pokemon/edit/${pokemon._id}`} variant='ghost' colorScheme='blue'>
-            Edit Pokemon
+          <Button width='100%' onClick={handleDeletePokemon} colorScheme='red'>
+            Delete Pokémon
           </Button>
-          <Button as={Link} to={`/pokemon/${pokemon._id}`} variant='ghost' colorScheme='red'>
-            View Details
-          </Button>
-        </ButtonGroup>
       </CardFooter>
     </Card>
   );
 }
 
-export default PokemonCard;
+export default DeletePokemonCard;
