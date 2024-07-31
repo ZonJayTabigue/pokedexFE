@@ -17,6 +17,7 @@ import { Box,
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { loginAPI } from '../../utils/api/Login';
+import { useAuth } from '../../utils/middleware/AuthContext';
 
 const Login = () => {
   const bg = useColorModeValue('white', 'gray.700');
@@ -26,6 +27,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const toast = useToast();
+  const { setToken } = useAuth();
 
   const handlePasswordVisibility = () => {
       setShowPassword(!showPassword);
@@ -34,6 +36,7 @@ const Login = () => {
   async function handleSubmit (event: React.FormEvent) {
       const res = await loginAPI(username, password);
       if (res.status === 200) {
+          setToken(res.token);
          navigate('/');
       } else {
         toast({
