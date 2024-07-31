@@ -22,6 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('Checking Token')
     const storedToken = Cookies.get('token');
     if (storedToken) {
       setToken(storedToken);
